@@ -1,0 +1,20 @@
+# Пример сканера UDP (QUIC). Загрузите в GUI: Сканеры → «Загрузить YAML…»
+scanner: udp
+target:
+  host: discord.com        # домен резолвится через DoH (cloudflare), затем системным резолвером
+  port: 443
+  proto: udp
+l7: quic                   # quic | stun | wireguard
+probe:
+  mode: http3              # http3 = curl --http3-only (реальный QUIC Initial с SNI); иначе проба Version Negotiation
+  attempts: 3
+  timeout: 3.0
+space:
+  repeats: {min: 2, max: 11, step: 3}       # 2, 5, 8, 11
+  blobs: [fake_default_quic, "0x00000000000000000000000000000000"]
+  fooling: ["", "ip_autottl=-2,3-20:ip6_autottl=-2,3-20"]
+limits:
+  max_candidates: 40
+  stop_on_first_success: false
+runtime:
+  qnum: 210                # отдельная очередь, чтобы не мешать основному запуску
